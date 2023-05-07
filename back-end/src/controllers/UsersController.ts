@@ -1,5 +1,6 @@
 import { Response, Request } from "express";
 import { prisma } from "../lib/prisma";
+import { AppError } from "../errors/AppError";
 
 export class UsersController {
   public async list(_request: Request, response: Response) {
@@ -14,6 +15,8 @@ export class UsersController {
     const user = await prisma.user.findUnique({
       where: { id },
     });
+
+    if (!user) throw new AppError("User not found", 404);
 
     return response.status(200).json(user);
   }
@@ -35,6 +38,12 @@ export class UsersController {
     const id = request.params.id;
     const { name, email } = request.body;
 
+    const userExists = await prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!userExists) throw new AppError("User not found", 404);
+
     const user = await prisma.user.update({
       where: { id },
       data: {
@@ -49,7 +58,13 @@ export class UsersController {
   public async delete(request: Request, response: Response) {
     const id = request.params.id;
 
-    const user = await prisma.user.delete({
+    const user = await prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) throw new AppError("User not found", 404);
+
+    await prisma.user.delete({
       where: { id },
     });
 
