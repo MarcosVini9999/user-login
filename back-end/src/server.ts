@@ -1,14 +1,7 @@
-import express, { Router } from "express";
+import express from "express";
+import { routes } from "./routes";
 
 const app = express();
-
-const routes = Router();
-
-routes.get("/hello-world", (_request, response) => {
-  return response.status(200).json({
-    message: "Hello World, I'm talking about port 3333",
-  });
-});
 
 app.use(routes);
 
